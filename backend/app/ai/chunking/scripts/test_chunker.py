@@ -11,10 +11,10 @@ ROOT = Path(__file__).resolve().parents[2]
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 
-from ai.chunking.chunker import chunk_text
+from backend.app.ai.chunking.chunker import chunk_text
 
 def main():
-    sample = ROOT / "sample_text.txt"
+    sample = ROOT / "Sem3DSAChapter1_api.txt"
     if not sample.exists():
         print("Put your extracted text into sample_text.txt at project root and re-run.")
         return

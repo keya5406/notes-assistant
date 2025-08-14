@@ -28,21 +28,34 @@ def is_heading(line: str) -> bool:
         return True
     return False
 
-def merge_heading_chunks(chunks: List[str]) -> List[str]:
+def merge_heading_chunks(sections, max_chunk_size=800):
+    """
+    Merge sections into chunks without breaking headings or definitions.
+    Keeps paragraphs together when possible.
+    """
     merged_chunks = []
-    skip_next = False
-    for i in range(len(chunks)):
-        if skip_next:
-            skip_next = False
+    current_chunk = ""
+
+    for sec in sections:
+        sec = sec.strip()
+        if not sec:
             continue
-        chunk = chunks[i].strip()
-        if is_heading(chunk) and i + 1 < len(chunks):
-            # Merge heading with next chunk to keep context
-            merged = chunk + " " + chunks[i + 1].strip()
-            merged_chunks.append(merged)
-            skip_next = True
+
+        # If adding section exceeds limit, start new chunk
+        if len(current_chunk) + len(sec) + 1 > max_chunk_size:
+            if current_chunk:
+                merged_chunks.append(current_chunk.strip())
+            current_chunk = sec
         else:
-            merged_chunks.append(chunk)
+            if current_chunk:
+                current_chunk += "\n\n" + sec
+            else:
+                current_chunk = sec
+
+    # Append the last chunk
+    if current_chunk:
+        merged_chunks.append(current_chunk.strip())
+
     return merged_chunks
 
 def clean_leading_chars(chunk: str) -> str:
