@@ -1,7 +1,7 @@
 import os
 import shutil
 from fastapi import APIRouter, UploadFile, File, HTTPException
-from app.services.extractor import extract_text_from_pdf
+import app.services.extractor as ext
 
 router = APIRouter()
 
@@ -22,7 +22,7 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     try:
         # 4. Extract text
-        extracted_text = extract_text_from_pdf(temp_file_path)
+        extracted_text = ext.extract_text_from_pdf(temp_file_path)
 
         if not extracted_text.strip():
             raise HTTPException(status_code=400, detail="No text found in PDF.")
