@@ -1,37 +1,38 @@
-import os
 from backend.app.ai.chunking.chunker import chunk_text
 from backend.app.ai.embeddings.embedder import Embedder
-from backend.app.ai.embeddings.vector_store import VectorStore
+from backend.app.ai.embeddings.qdrant_store import QdrantStore
+
 
 def main():
-    # 1. Load text file
-    file_path = "sample_text_3.txt"  # change to your file
-    with open(file_path, "r", encoding="utf-8") as f:
+    # 1. Load document
+    with open("sample_text_3.txt", "r", encoding="utf-8") as f:
         raw_text = f.read()
 
     # 2. Chunk text
     chunks = chunk_text(raw_text)
     print(f"✅ Generated {len(chunks)} chunks")
 
-    # 3. Init embedder + vector store
+    # 3. Embed chunks
     embedder = Embedder()
-    vector_store = VectorStore(collection_name="test_docs")
+    vectors = embedder.embed_texts(chunks)
 
-    # 4. Embed + store
-    for i, chunk in enumerate(chunks):
-        embedding = embedder.embed(chunk)
-        vector_store.add_embedding(
-            embedding=embedding,
-            metadata={"chunk_id": i, "text": chunk}
-        )
+    # 4. Store in Qdrant Cloud (env handled inside QdrantStore)
+    store = QdrantStore(
+        collection_name="notes_collection",
+        vector_size=len(vectors[0]),
+    )
+    store.add(vectors, chunks)
+    print("✅ Stored chunks in Qdrant Cloud")
 
     # 5. Query
-    query = "applications of trees?"
-    results = vector_store.query(query, top_k=3)
+    query = "What is tree?"
+    query_embedding = embedder.embed(query)
+    results = store.query(query_embedding, top_k=3)
 
-    print(f"\n🔍 Query: {query}")
-    for r in results:
-        print(f" -> {r['metadata']['text']} | Score: {r['score']:.4f}")
+    print("\n=== QUERY RESULTS ===")
+    for text, score in results:
+        print(f"[{score:.4f}] {text}")
+
 
 if __name__ == "__main__":
     main()
