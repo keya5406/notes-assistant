@@ -1,44 +1,45 @@
 from fastapi import APIRouter, HTTPException
-import app.model.ask_models as ask
-import app.services.embeddings as emb
-import app.services.retrieval as ret
+from pydantic import BaseModel
+from backend.app.ai.embeddings.dependencies import embedder, qdrant_store
 
 router = APIRouter()
 
-@router.post("/ask", response_model=ask.AskResponse)
-async def ask_question(payload: ask.AskRequest):
-    # Validate question
-    question = payload.question.strip()
-    if not question:
-        raise HTTPException(status_code=400, detail="Question cannot be empty")
+class AskRequest(BaseModel):
+    question: str
 
-    # Embed question
-    query_vector = emb.embed_question(question)
+@router.post("/ask")
+async def ask_question(request: AskRequest):
+    try:
+        # Get and validate question
+        question = request.question.strip()
+        if not question:
+            raise HTTPException(status_code=400, detail="Question cannot be empty")
 
-    # Retrieve from Qdrant
-    results = ret.retrieve_top_k(query_vector, k=5)
+        # Embed the question
+        query_vector = embedder.embed_texts([question])[0]
 
-    if not results:
-        return ask.AskResponse(context="", chunks=[])
+        # Query Qdrant
+        results = qdrant_store.query(query_vector, top_k=3)
 
-    # Sort chunks if metadata has 'order'
-    chunks = []
-    for res in results:
-        payload = res.payload or {}
-        chunks.append({
-            "text": payload.get("text", ""),
-            "source": payload.get("source", "N/A"),
-            "order": payload.get("order", None),
-            "score": res.score
-        })
+        if not results:
+            return {"status": "success", "context": "", "chunks": []}
 
-    chunks.sort(key=lambda x: x["order"] if x["order"] is not None else 9999)
+        # Prepare chunks
+        chunks = []
+        for r in results:
+            chunks.append({
+                "text": r["text"],
+                "score": r["score"]
+            })
 
-    # Join into context string
-    context = "\n".join(chunk["text"] for chunk in chunks if chunk["text"])
+        # Build context
+        context = "\n".join(chunk["text"] for chunk in chunks if chunk["text"])
 
-    # Return placeholder response
-    return ask.AskResponse(
-        context=context,
-        chunks=chunks
-    )
+        return {
+            "status": "success",
+            "context": context,
+            "chunks": chunks
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error in ask API: {str(e)}")

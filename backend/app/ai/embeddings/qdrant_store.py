@@ -11,38 +11,42 @@ QDRANT_API_KEY = os.getenv("QDRANT_API_KEY")
 class QdrantStore:
     def __init__(self, collection_name: str, vector_size: int):
         self.collection_name = collection_name
-        self.client = QdrantClient(
-            url=QDRANT_URL,
-            api_key=QDRANT_API_KEY,
-        )
+        self.client = QdrantClient(url=QDRANT_URL, api_key=QDRANT_API_KEY)
 
-        # Check if collection exists, otherwise create
+        # Create collection if not exists
         collections = self.client.get_collections().collections
         if not any(c.name == self.collection_name for c in collections):
             print(f"[INFO] Creating collection: {self.collection_name}")
             self.client.create_collection(
                 collection_name=self.collection_name,
                 vectors_config=models.VectorParams(
-                    size=vector_size, distance=models.Distance.COSINE
-                )
+                    size=vector_size,
+                    distance=models.Distance.COSINE,
+                ),
             )
 
-    def add(self, vectors: list[list[float]], texts: list[str]):
-        """Add embeddings + original texts to Qdrant."""
-        payloads = [{"text": t} for t in texts]
+    def upsert(self, vectors: list[list[float]], payloads: list[dict]):
+        """Upsert embeddings with metadata (payloads) into Qdrant."""
         self.client.upsert(
             collection_name=self.collection_name,
             points=[
-                models.PointStruct(id=i, vector=vectors[i], payload=payloads[i])
+                models.PointStruct(
+                    id=i,
+                    vector=vectors[i],
+                    payload=payloads[i],
+                )
                 for i in range(len(vectors))
-            ]
+            ],
         )
 
-    def query(self, query_vector: list[float], top_k: int = 5):
+    def query(self, query_vector: list[float], top_k: int = 5) -> list[dict]:
         """Query most similar texts from Qdrant."""
         results = self.client.search(
             collection_name=self.collection_name,
             query_vector=query_vector,
-            limit=top_k
+            limit=top_k,
         )
-        return [(r.payload["text"], r.score) for r in results]
+        return [
+            {"text": r.payload.get("text"), "score": r.score, "payload": r.payload}
+            for r in results
+        ]

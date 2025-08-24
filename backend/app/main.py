@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import upload, ask
+from backend.app.api import upload, ask
 
 app = FastAPI(title="Notes Assistant API")
 
