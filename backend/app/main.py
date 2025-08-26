@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import upload, ask
+from app.api import ask, drive_router
 
 app = FastAPI(title="Notes Assistant API")
 
@@ -19,5 +19,8 @@ def health_check():
     return {"status": "ok"}
 
 # Include API routes
-app.include_router(upload.router, prefix="/api", tags=["Upload"])
-app.include_router(ask.router)
+app.include_router(ask.router, prefix="/api")
+app.include_router(drive_router.router, prefix="/api")
+
+for route in app.routes:
+    print(route.path, route.methods)
