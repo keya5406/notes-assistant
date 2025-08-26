@@ -6,40 +6,44 @@ router = APIRouter()
 
 class AskRequest(BaseModel):
     question: str
+    top_k: int = 3
 
 @router.post("/ask")
 async def ask_question(request: AskRequest):
     try:
-        # Get and validate question
         question = request.question.strip()
         if not question:
             raise HTTPException(status_code=400, detail="Question cannot be empty")
 
-        # Embed the question
+        # Step 1: Embed the question
         query_vector = embedder.embed_texts([question])[0]
 
-        # Query Qdrant
-        results = qdrant_store.query(query_vector, top_k=3)
-
+        # Step 2: Query Qdrant
+        results = qdrant_store.query(query_vector, top_k=request.top_k)
         if not results:
-            return {"status": "success", "context": "", "chunks": []}
+            return {
+                "status": "success",
+                "question": question,
+                "chunks": []
+            }
 
-        # Prepare chunks
+        # Step 3: Extract chunks
         chunks = []
         for r in results:
-            chunks.append({
-                "text": r["text"],
-                "score": r["score"]
-            })
+            if isinstance(r, dict):
+                text = r.get("text", "")
+                score = r.get("score", None)
+            else:  # Qdrant ScoredPoint
+                text = getattr(r, "payload", {}).get("text", "")
+                score = getattr(r, "score", None)
+            chunks.append({"text": text, "score": score})
 
-        # Build context
-        context = "\n".join(chunk["text"] for chunk in chunks if chunk["text"])
-
+        # Step 4: Return only question + chunks
         return {
             "status": "success",
-            "context": context,
+            "question": question,
             "chunks": chunks
         }
 
     except Exception as e:
-        raise HTTPException(status_code=500, detail=f"Error in ask API: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Unexpected error: {str(e)}")
