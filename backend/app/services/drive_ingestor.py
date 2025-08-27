@@ -6,7 +6,7 @@ from pathlib import Path
 import app.utils.google_drive as google_drive
 import app.services.extractor as ext
 
-BASE_DIR = Path(__file__).parent
+BASE_DIR = Path(__file__).parent.parent
 PROCESSED_FILE_PATH = BASE_DIR / "db" / "processed_files.json"
 
 load_dotenv()
@@ -42,7 +42,9 @@ def sync_drive_folder():
         file_bytes = google_drive.download_file(file_id)
 
         print(f"📄 Extracting text from: {file_name}")
-        extracted_text = ext.extract_text_from_pdf(file_bytes)
+        extracted_text = ext.extract_text_from_pdf_bytes(file_bytes)
+
+        print(extracted_text)
 
         # TODO: Push to embeddings / DB / pipeline
 
