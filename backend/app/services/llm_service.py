@@ -7,7 +7,7 @@ load_dotenv()
 api_key = os.getenv("API_KEY")
 genai.configure(api_key=api_key)
 
-async def get_answer_from_context() -> str:
+async def get_answer_from_context(CONTEXT: list[str], QUESTION:str) -> str:
 
     #Add parameters: context and a question.
     try:
@@ -22,18 +22,9 @@ async def get_answer_from_context() -> str:
 
         # Context and question is just for testing, will be replaced later when previous tickets are ready.
         prompt = f"""{system_instruction}
-
-CONTEXT: Elena was a software engineer working on a distributed microservices architecture.
-She was responsible for the API gateway, which handled authentication and request routing between services.
-Every day, she monitored the system using Prometheus metrics and Grafana dashboards to track latency and
-error rates. One day, she noticed that one microservice was experiencing unusually high CPU usage due to
-inefficient database queries. She optimized the queries and deployed the changes using a CI/CD pipeline,
-which reduced response times significantly and improved overall throughput.
-
-
-QUESTION: How did Elena track latency and error rates and why did Elena optimize the database queries in the microservice?
-"""
-
+        CONTEXT: {CONTEXT}
+        QUESTION:{QUESTION}
+        """
 
         def call_gemini():
             model = genai.GenerativeModel("gemini-2.5-flash-lite")

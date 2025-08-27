@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from backend.app.ai.embeddings.dependencies import embedder, qdrant_store
-
+from backend.app.services.llm_service import get_answer_from_context
 router = APIRouter()
 
 class AskRequest(BaseModel):
@@ -38,11 +38,13 @@ async def ask_question(request: AskRequest):
                 score = getattr(r, "score", None)
             chunks.append({"text": text, "score": score})
 
-        # Step 4: Return only question + chunks
+        # Step 4: call LLM
+        answer = await get_answer_from_context(chunks, question)
+
         return {
             "status": "success",
             "question": question,
-            "chunks": chunks
+            "answer": answer
         }
 
     except Exception as e:
