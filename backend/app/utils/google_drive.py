@@ -2,6 +2,7 @@ import os
 import io
 import pickle
 from typing import List, Dict
+from pathlib import Path
 
 from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
@@ -12,8 +13,8 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 
 TOKEN_PATH = "token.pickle"
-CREDENTIALS_PATH = os.path.join(os.path.dirname(__file__), "..", "secrets", "credentials.json")
-CREDENTIALS_PATH = os.path.abspath(CREDENTIALS_PATH)
+BASE_DIR = Path(__file__).parent
+CREDENTIALS_PATH = BASE_DIR / "secrets" / "credentials.json"
 
 def get_drive_service():
     """Authenticate and return Google Drive API service."""

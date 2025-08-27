@@ -6,7 +6,8 @@ from pathlib import Path
 import app.utils.google_drive as google_drive
 import app.services.extractor as ext
 
-PROCESSED_FILE_PATH = Path(__file__).parent.parent / "db" / "processed_files.json"
+BASE_DIR = Path(__file__).parent
+PROCESSED_FILE_PATH = BASE_DIR / "db" / "processed_files.json"
 
 load_dotenv()
 DRIVE_FOLDER_ID = os.getenv("DRIVE_FOLDER_ID")
