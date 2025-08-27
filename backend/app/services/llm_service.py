@@ -16,8 +16,10 @@ async def get_answer_from_context(CONTEXT: list[str], QUESTION:str) -> str:
             "Answer the user’s question using ONLY the provided context. "
             "Do NOT guess, infer, or use outside knowledge. "
             "If the answer is not explicitly present in the context, respond exactly with: \"I don't know\". "
-            "Provide a concise, clear, and complete answer in plain text, without adding explanations, commentary, or extra information. "
-            "If multiple context passages are provided, consider all of them but do not assume anything beyond what is written."
+            "When giving an answer, provide it in a detailed and structured manner, explaining each relevant part clearly. "
+            "Use complete sentences, examples, and step-by-step explanations where helpful so that even someone with no prior knowledge can fully understand. "
+            "If multiple context passages are provided, carefully integrate them into a single coherent and thorough answer without assuming anything beyond what is written. "
+            "If you notice minor typos or spelling errors in the context, silently correct them in your answer, but do not alter or replace entire words."
         )
 
         # Context and question is just for testing, will be replaced later when previous tickets are ready.
@@ -31,6 +33,8 @@ async def get_answer_from_context(CONTEXT: list[str], QUESTION:str) -> str:
             return model.generate_content(prompt)
 
         response = await asyncio.to_thread(call_gemini)
+
+        print(response.text)
 
         return response.text.strip()
 
