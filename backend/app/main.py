@@ -21,6 +21,3 @@ def health_check():
 # Include API routes
 app.include_router(ask.router, prefix="/api")
 app.include_router(drive_router.router, prefix="/api")
-
-for route in app.routes:
-    print(route.path, route.methods)

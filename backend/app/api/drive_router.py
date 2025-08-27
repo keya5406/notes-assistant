@@ -1,7 +1,7 @@
 from fastapi import  APIRouter
 from app.services.drive_ingestor import sync_drive_folder
 
-router = APIRouter(tags=["Drive"])
+router = APIRouter()
 
 @router.post("/sync-drive")
 async def sync_drive():
