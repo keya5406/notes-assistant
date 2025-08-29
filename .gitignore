@@ -210,5 +210,6 @@ backend/app/secrets/
 token.pickle
 token.json
 credentials.json
+
 backend/app/db/processed_files.json
 processed_files.json
