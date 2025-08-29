@@ -128,9 +128,9 @@ def chunk_text(raw_text: str,
     if not raw_text or not raw_text.strip():
         return []
 
-    print("\n\n=== DEBUG: TEXT RECEIVED FOR CHUNKING ===")
-    print(raw_text[:2000])
-    print("=== END OF TEXT RECEIVED ===\n\n")
+    # print("\n\n=== DEBUG: TEXT RECEIVED FOR CHUNKING ===")
+    # print(raw_text[:2000])
+    # print("=== END OF TEXT RECEIVED ===\n\n")
 
     # 1) Clean text
     text = preprocess_pdf_text(raw_text)
@@ -153,9 +153,9 @@ def chunk_text(raw_text: str,
     # 5) Merge heading chunks (optional)
     chunks = merge_heading_chunks(chunks)
 
-    print("\n\n=== DEBUG: CHUNKS GENERATED ===")
-    for i, chunk in enumerate(chunks):
-        print(f"\n--- CHUNK {i + 1} ---\n{chunk}\n")
-    print("=== END OF CHUNKS ===\n\n")
+    # print("\n\n=== DEBUG: CHUNKS GENERATED ===")
+    # for i, chunk in enumerate(chunks):
+    #     print(f"\n--- CHUNK {i + 1} ---\n{chunk}\n")
+    # print("=== END OF CHUNKS ===\n\n")
 
     return chunks

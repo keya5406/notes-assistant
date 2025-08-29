@@ -7,7 +7,7 @@ load_dotenv()
 api_key = os.getenv("API_KEY")
 genai.configure(api_key=api_key)
 
-async def get_answer_from_context(CONTEXT: list[str], QUESTION:str) -> str:
+async def get_answer_from_context(context: list[str], question: str) -> str:
 
     #Add parameters: context and a question.
     try:
@@ -15,7 +15,6 @@ async def get_answer_from_context(CONTEXT: list[str], QUESTION:str) -> str:
             "You are a highly precise and reliable assistant. "
             "Answer the user’s question using ONLY the provided context. "
             "Do NOT guess, infer, or use outside knowledge. "
-            "If the answer is not explicitly present in the context, respond exactly with: \"I don't know\". "
             "When giving an answer, provide it in a detailed and structured manner, explaining each relevant part clearly. "
             "Use complete sentences, examples, and step-by-step explanations where helpful so that even someone with no prior knowledge can fully understand. "
             "If multiple context passages are provided, carefully integrate them into a single coherent and thorough answer without assuming anything beyond what is written. "
@@ -24,8 +23,8 @@ async def get_answer_from_context(CONTEXT: list[str], QUESTION:str) -> str:
 
         # Context and question is just for testing, will be replaced later when previous tickets are ready.
         prompt = f"""{system_instruction}
-        CONTEXT: {CONTEXT}
-        QUESTION:{QUESTION}
+        CONTEXT: {context}
+        QUESTION:{question}
         """
 
         def call_gemini():
