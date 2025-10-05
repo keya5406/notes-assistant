@@ -1,5 +1,5 @@
 from fastapi import  APIRouter
-from app.services.drive_ingestor import sync_drive_folder
+from backend.app.services.drive_ingestor import sync_drive_folder
 
 router = APIRouter()
 

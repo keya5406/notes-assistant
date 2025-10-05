@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException
-import app.model.ask_models as ask
-import app.services.embeddings as emb
-import app.services.retrieval as ret
+import backend.app.model.ask_models as ask
+import backend.app.services.embeddings as emb
+import backend.app.services.retrieval as ret
 
 router = APIRouter()
 

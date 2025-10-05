@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.api import ask, drive_router
+from backend.app.api import ask, drive_router
 
 app = FastAPI(title="Notes Assistant API")
 

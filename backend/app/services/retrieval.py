@@ -1,5 +1,5 @@
 from typing import List
-import app.db.qdrant_conn as qd
+import backend.app.db.qdrant_conn as qd
 
 def retrieve_top_k(query_embedding: List[float], k: int = 5):
     # Query Qdrant for top-k most similar chunks.

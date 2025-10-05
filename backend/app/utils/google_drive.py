@@ -14,7 +14,7 @@ SCOPES = ["https://www.googleapis.com/auth/drive.readonly"]
 
 TOKEN_PATH = "token.pickle"
 BASE_DIR = Path(__file__).parent
-CREDENTIALS_PATH = BASE_DIR / "secrets" / "credentials.json"
+CREDENTIALS_PATH = BASE_DIR / "credentials.json"
 
 def get_drive_service():
     """Authenticate and return Google Drive API service."""

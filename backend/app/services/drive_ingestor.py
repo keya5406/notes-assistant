@@ -3,8 +3,8 @@ import os
 from dotenv import load_dotenv
 from pathlib import Path
 
-import app.utils.google_drive as google_drive
-import app.services.extractor as ext
+import backend.app.utils.google_drive as google_drive
+import backend.app.services.extractor as ext
 
 BASE_DIR = Path(__file__).parent.parent
 PROCESSED_FILE_PATH = BASE_DIR / "db" / "processed_files.json"
