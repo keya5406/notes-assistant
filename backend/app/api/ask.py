@@ -1,12 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
 from pydantic import BaseModel
 from backend.app.ai.embeddings.dependencies import embedder, qdrant_store
 from backend.app.services.llm_service import get_answer_from_context
+
 router = APIRouter()
 
 class AskRequest(BaseModel):
     question: str
     top_k: int = 3
+    subject_code: str | None = None  # optional filter by subject_code
 
 @router.post("/ask")
 async def ask_question(request: AskRequest):
@@ -19,7 +21,12 @@ async def ask_question(request: AskRequest):
         query_vector = embedder.embed_texts([question])[0]
 
         # Step 2: Query Qdrant
-        results = qdrant_store.query(query_vector, top_k=request.top_k)
+        results = qdrant_store.query(
+            query_vector,
+            top_k=request.top_k,
+            subject_code=request.subject_code  # filter by subject_code if provided
+        )
+
         if not results:
             return {
                 "status": "success",
@@ -28,17 +35,12 @@ async def ask_question(request: AskRequest):
             }
 
         # Step 3: Extract chunks
-        chunks = []
-        for r in results:
-            if isinstance(r, dict):
-                text = r.get("text", "")
-                score = r.get("score", None)
-            else:  # Qdrant ScoredPoint
-                text = getattr(r, "payload", {}).get("text", "")
-                score = getattr(r, "score", None)
-            chunks.append({"text": text, "score": score})
+        chunks = [
+            {"text": r.get("text", ""), "score": r.get("score")}
+            for r in results
+        ]
 
-        # Step 4: call LLM
+        # Step 4: Call LLM
         answer = await get_answer_from_context(chunks, question)
 
         return {
