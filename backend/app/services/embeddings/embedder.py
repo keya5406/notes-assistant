@@ -1,4 +1,4 @@
-from backend.app.ai.embeddings.config import EMBEDDING_MODEL_NAME, DEVICE
+from backend.app.services.embeddings.config import EMBEDDING_MODEL_NAME, DEVICE
 from sentence_transformers import SentenceTransformer
 
 

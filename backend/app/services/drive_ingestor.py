@@ -6,8 +6,8 @@ from pathlib import Path
 
 import backend.app.utils.google_drive as google_drive
 import backend.app.services.extractor as ext
-from backend.app.ai.chunking.chunker import chunk_text
-from backend.app.ai.embeddings.dependencies import embedder, qdrant_store
+from backend.app.services.chunking.chunker import chunk_text
+from backend.app.services.embeddings.dependencies import embedder, qdrant_store
 
 BASE_DIR = Path(__file__).parent.parent
 PROCESSED_FILE_PATH = BASE_DIR / "db" / "processed_files.json"

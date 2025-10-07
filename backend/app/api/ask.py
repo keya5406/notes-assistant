@@ -1,6 +1,6 @@
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
-from backend.app.ai.embeddings.dependencies import embedder, qdrant_store
+from backend.app.services.embeddings.dependencies import embedder, qdrant_store
 from backend.app.services.llm_service import get_answer_from_context
 
 router = APIRouter()
